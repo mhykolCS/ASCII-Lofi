@@ -1,12 +1,18 @@
+#include <opencv2/opencv.hpp> 
+#include <stdio.h> 
 
-#include <string>
-using namespace cv;
-int main()
-{
-    std::string image_path = "path/to/image";
-    Mat img = imread(image_path, IMREAD_COLOR);
+using namespace cv; 
 
-    imshow("Display window", img);
-    int k = waitKey(0); // Wait for a keystroke in the window
-    return 0;
+int main(int argc, char** argv) 
+{ 
+    Mat image; 
+    image = imread("temp.png", 1); 
+    if (!image.data) { 
+        printf("No image data \n"); 
+        return -1; 
+    } 
+    namedWindow("Display Image", WINDOW_AUTOSIZE); 
+    imshow("Display Image", image); 
+    waitKey(0); 
+    return 0; 
 }
