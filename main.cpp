@@ -1,18 +1,30 @@
 #include "opencv2/opencv.hpp"
-#include <stdio.h> 
-
-using namespace cv; 
+#include <iostream>
+#include <stdio.h>  
 
 int main(int argc, char** argv) 
 { 
-    Mat image; 
-    image = imread("temp.png", 1); 
-    if (!image.data) { 
-        printf("No image data \n"); 
-        return -1; 
-    } 
-    namedWindow("Display Image", WINDOW_AUTOSIZE); 
-    imshow("Display Image", image); 
-    waitKey(0); 
+    
+    cv::Mat frame;
+
+    cv::VideoCapture capture("test.webm");
+
+    if(!capture.isOpened()){
+        std::cerr << "Error! Unable to open video\n";
+        return(-1);
+    }
+
+    std::cout << "Start Grabbing\nPress any key to stop\n";
+    for(;;){
+        capture.read(frame);
+        if(frame.empty()){
+            std::cerr << "Error! Blank frame\n";
+            break;
+        }
+
+        cv:imshow("Live", frame);
+        if(cv::waitKey(5) >= 0) break;
+    }
+
     return 0; 
 }
