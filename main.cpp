@@ -1,6 +1,5 @@
 #include "opencv2/opencv.hpp"
 #include <curses.h>
-#include <iostream>
 #include <string>
 #include <chrono>
 #include <thread>
@@ -8,10 +7,8 @@
 
 int main(int argc, char** argv) 
 {
-    // initscr();
-    // cbreak();
-    // noecho();
-
+    initscr();
+    curs_set(0);
     cv::Mat frame, resized_frame;
     cv::VideoCapture capture("test.webm");
 
@@ -25,39 +22,31 @@ int main(int argc, char** argv)
     capture.read(frame);
     int width = frame.cols / 20;
     int height = frame.rows / 35;
-    std::string height_string = std::to_string(height);
-    std::string resetSequence = "\033[<" + height_string + ">A";
 
     cv::Vec3b bgrPixel;
 
-    std::cout << "Start Grabbing\nPress any key to stop\n";
     for(;;){
         cv::resize(frame, resized_frame, cv::Size(width, height), 0, 0, cv::INTER_LINEAR_EXACT);
         for(int row = 0; row < resized_frame.rows; row++){
             for(int col = 0; col < resized_frame.cols; col++){
                 bgrPixel = resized_frame.at<cv::Vec3b>(row,col);
                 pixelBrightness = (((int)bgrPixel[0] + (int)bgrPixel[1] + (int)bgrPixel[2]) / 3) / 28;
-                std::cout << CHAR_POOL[pixelBrightness];
+                printw("%c", CHAR_POOL[pixelBrightness]);
             }
-            std::cout << std::endl;
+            refresh();
+            printw("\n");
         }
-
-        std::cout << resetSequence;
-
-        // cv::imshow("Live", resized_frame);
-        if(cv::waitKey(5) >= 0) break;
 
         capture.read(frame);
-        if(frame.empty()){
-            std::cerr << "Error! Blank frame\n";
-            break;
-        }
+        if(frame.empty()) break;
+
         
-        std::this_thread::sleep_for(std::chrono::milliseconds(30));
-        system("clear");
-        
+        std::this_thread::sleep_for(std::chrono::milliseconds(15));
+
+        move(0,0);
     }
 
     cv::destroyAllWindows();
+    endwin();
     return 0; 
 }
