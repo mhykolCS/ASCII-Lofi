@@ -1,46 +1,52 @@
 #include "opencv2/opencv.hpp"
 #include <iostream>
-#include <stdio.h>  
+#include <stdio.h>
+#include <string>
 
 int main(int argc, char** argv) 
 {
-    cv::Mat frame;
+    cv::Mat frame, resized_frame;
     cv::VideoCapture capture("test.webm");
+
+    int pixelBrightness = 0;
+
+    //const std::string CHAR_POOL = "⣿⠿⠶⠒⠂⠀";
+    //const std::string CHAR_POOL = "█▇▆▅▄▃▂▁ ";
+    const std::string CHAR_POOL = "@%#*+=-. ";
 
     if(!capture.isOpened()){
         std::cerr << "Error! Unable to open video\n";
         return(-1);
     }
-
-    int fps = capture.get(cv::CAP_PROP_FPS);
-    int frame_count = (int) capture.get(cv::CAP_PROP_FRAME_COUNT);
-    double duration = frame_count/fps;
-
     capture.read(frame);
+    int width = frame.cols / 20;
+    int height = frame.rows / 20;
 
-    uint8_t* pixelPtr = (uint8_t*)frame.data;
-    int cn = frame.channels();
-    cv::Scalar_<uint8_t> bgrPixel;  
+    cv::Vec3b bgrPixel;
 
     std::cout << "Start Grabbing\nPress any key to stop\n";
     for(;;){
+        cv::resize(frame, resized_frame, cv::Size(width, height), cv::INTER_LINEAR);
+        for(int row = 0; row < resized_frame.rows; row++){
+            for(int col = 0; col < resized_frame.cols; col++){
+                bgrPixel = resized_frame.at<cv::Vec3b>(row,col);
+                pixelBrightness = (((int)bgrPixel[0] + (int)bgrPixel[1] + (int)bgrPixel[2]) / 3) / 34;
+                std::cout << CHAR_POOL[pixelBrightness];
+            }
+            std::cout << std::endl;
+        }
+
+        // cv::imshow("Live", resized_frame);
+        // if(cv::waitKey(5) >= 0) break;
+
         capture.read(frame);
         if(frame.empty()){
             std::cerr << "Error! Blank frame\n";
             break;
         }
-
-        for(int i = 0; i < frame.rows; i++){
-            for(int j = 0; j < frame.cols; j++){
-                bgrPixel.val[0] = pixelPtr[i * frame.cols * cn + j * cn + 0]; // B
-                bgrPixel.val[1] = pixelPtr[i * frame.cols * cn + j * cn + 1]; // G
-                bgrPixel.val[2] = pixelPtr[i * frame.cols * cn + j * cn + 2]; // R
-            }
-        }
-
-        cv:imshow("Live", frame);
-        if(cv::waitKey(5) >= 0) break;
+        std::system("clear");
     }
 
+    cv::destroyAllWindows();
     return 0; 
 }
