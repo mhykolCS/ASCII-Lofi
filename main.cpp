@@ -4,7 +4,6 @@
 #include <chrono>
 #include <thread>
 
-
 void initColors(){
     init_color(  1,    0,    0,  666 ); //Dark Blue
     init_color(  2,    0,  666,    0 ); //Dark Green
@@ -61,11 +60,11 @@ int main(int argc, char** argv)
 
     curs_set(0);
     cv::Mat frame, resized_frame;
-    cv::VideoCapture capture("test1.webm");
+    cv::VideoCapture capture("test.webm");
 
-    int totalFrames = capture.get(cv::CAP_PROP_FRAME_COUNT);
-    int videoLength = 165;
-    int fps = totalFrames / videoLength / 2;
+    auto startClock = std::chrono::high_resolution_clock::now(); 
+    auto endClock = std::chrono::high_resolution_clock::now(); 
+    auto actualDurationOfFrame = std::chrono::duration_cast<std::chrono::milliseconds>(endClock-startClock).count();
 
     int pixelBrightness = 0;
     const std::string CHAR_POOL = " .-=+`*%#";
@@ -75,10 +74,18 @@ int main(int argc, char** argv)
     capture.read(frame);
     int width = 130;
     int height = 40;
+    double fps = capture.get(cv::CAP_PROP_FPS);
+    double estimatedDurationOfFrame = 1000/fps;
+    int currentFrame= 1;
+    double expectedTime = estimatedDurationOfFrame*currentFrame;
 
     cv::Vec3b bgrPixel;
+    startClock = std::chrono::high_resolution_clock::now(); 
+    int currentTime;
 
     for(;;){
+        currentFrame += 1;
+
         cv::resize(frame, resized_frame, cv::Size(width, height), cv::INTER_CUBIC);
         for(int row = 0; row < resized_frame.rows; row++){
             for(int col = 0; col < resized_frame.cols; col++){
@@ -91,13 +98,16 @@ int main(int argc, char** argv)
             refresh();
             printw("\n");
         }
-
         capture.read(frame);
         if(frame.empty()) break;
-
         
+        expectedTime = estimatedDurationOfFrame*currentFrame;
+        endClock = std::chrono::high_resolution_clock::now(); 
+        currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(endClock-startClock).count();
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(fps));
+        if(currentTime < expectedTime){
+            std::this_thread::sleep_for(std::chrono::milliseconds((int)(expectedTime-currentTime)));
+        }
 
         move(0,0);
     }
