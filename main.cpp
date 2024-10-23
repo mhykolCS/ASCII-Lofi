@@ -61,7 +61,11 @@ int main(int argc, char** argv)
 
     curs_set(0);
     cv::Mat frame, resized_frame;
-    cv::VideoCapture capture("test.webm");
+    cv::VideoCapture capture("test1.webm");
+
+    int totalFrames = capture.get(cv::CAP_PROP_FRAME_COUNT);
+    int videoLength = 165;
+    int fps = totalFrames / videoLength / 2;
 
     int pixelBrightness = 0;
     const std::string CHAR_POOL = " .-=+`*%#";
@@ -69,17 +73,17 @@ int main(int argc, char** argv)
     if(!capture.isOpened()) return(-1);
 
     capture.read(frame);
-    int width = frame.cols / 20;
-    int height = frame.rows / 35;
+    int width = 130;
+    int height = 40;
 
     cv::Vec3b bgrPixel;
 
     for(;;){
-        cv::resize(frame, resized_frame, cv::Size(width, height), 0, 0, cv::INTER_LINEAR_EXACT);
+        cv::resize(frame, resized_frame, cv::Size(width, height), cv::INTER_CUBIC);
         for(int row = 0; row < resized_frame.rows; row++){
             for(int col = 0; col < resized_frame.cols; col++){
                 bgrPixel = resized_frame.at<cv::Vec3b>(row,col);
-                pixelBrightness = (((int)bgrPixel[0] + (int)bgrPixel[1] + (int)bgrPixel[2]) / 3) / 27;
+                pixelBrightness = (((int)bgrPixel[0] + (int)bgrPixel[1] + (int)bgrPixel[2]) / 3) / 29;
                 attrset(COLOR_PAIR(returnColor(bgrPixel[2], bgrPixel[1], bgrPixel[0])));
 
                 printw("%c", CHAR_POOL[pixelBrightness]);
@@ -91,7 +95,9 @@ int main(int argc, char** argv)
         capture.read(frame);
         if(frame.empty()) break;
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(15));
+        
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(fps));
 
         move(0,0);
     }
