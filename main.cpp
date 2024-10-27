@@ -4,7 +4,7 @@
 #include <chrono>
 #include <thread>
 
-int main(){
+int main(){v
     std::cout << "\e[48;2;0;0;0m"; //Set background colour to black
     std::cout << "\e[H"; //Set to 0,0
     std::cout << "\e[?25l"; //Remove cursor
