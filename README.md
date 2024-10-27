@@ -1,7 +1,7 @@
 ## Install Instructions:
 1. Install the dependencies: 
     ```
-    yay -S gcc cmake make git openmpi pkg-config libjpeg-turbo libpng libtiff openexr zlib ffmpeg python3 python-numpy java-runtime qt6-wayland gstreamer gtk3 hdf5 vtk glew fmt ncurses
+    yay -S --no-confirm base-devel gcc cmake make git openmpi pkg-config libjpeg-turbo libpng libtiff openexr zlib ffmpeg python3 python-numpy java-runtime qt6-wayland gstreamer gtk3 hdf5 vtk glew fmt ncurses libsndfile json-c intltool libtool libpulse
     ```
 2. Clone the OpenCV Git for build/compile
     ```
@@ -25,3 +25,4 @@
     cd
     rm -rf build opencv
     ```
+

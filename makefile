@@ -6,3 +6,4 @@ all : main.cpp
 	g++ $(CFLAGS) $(LIBS) -o lofiAscii main.cpp
 	clear
 	./lofiAscii
+
