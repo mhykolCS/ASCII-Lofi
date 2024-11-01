@@ -1,64 +1,122 @@
-#include <iostream>
-#include "opencv2/opencv.hpp"
-#include <string>
-#include <chrono>
-#include <thread>
+#include "asciiLofi.h"
+#include <ncurses.h>
 
-int main(){v
-    std::cout << "\e[48;2;0;0;0m"; //Set background colour to black
-    std::cout << "\e[H"; //Set to 0,0
-    std::cout << "\e[?25l"; //Remove cursor
 
-    cv::Mat frame, resized_frame;
-    cv::VideoCapture capture("test4.webm");
+int readOptions(){
+    switch(getch()){
+        case KEY_UP:
+            return(0);
+        case KEY_DOWN:
+            return(1);
+        case '\n':
+            return(2);
+        default:
+            return(3);
+    }
+}
 
-    auto startClock = std::chrono::high_resolution_clock::now(); 
-    auto endClock = std::chrono::high_resolution_clock::now(); 
-    auto actualDurationOfFrame = std::chrono::duration_cast<std::chrono::milliseconds>(endClock-startClock).count();
+int main(){
+    initscr();
+    curs_set(0);
+    keypad(stdscr, TRUE);
+    noecho();
+    start_color();
+    system("mkdir -p data");
+    init_pair(1, COLOR_WHITE, COLOR_BLACK);
+    init_pair(2, COLOR_BLACK, COLOR_WHITE);
 
-    int pixelBrightness = 0;
-    const std::string CHAR_POOL = " ..--==++''**\%%\%%##";
+    int video_width = 137;
+    int video_height = 40;
+    int selection = 0;
+    bool confirmed = false;
 
-    if(!capture.isOpened()) return(-1);
-
-    capture.read(frame);
-    int width = 450 ;
-    int height = 125;
-    double fps = capture.get(cv::CAP_PROP_FPS);
-    double estimatedDurationOfFrame = 1000/fps;
-    int currentFrame= 1;
-    double expectedTime = estimatedDurationOfFrame*currentFrame;
-
-    cv::Vec3b bgrPixel;
-    startClock = std::chrono::high_resolution_clock::now(); 
-    int currentTime;
+    std::vector<std::string> files;
 
     for(;;){
-        currentFrame += 1;
+        move(0,0);
 
-        cv::resize(frame, resized_frame, cv::Size(width, height), cv::INTER_CUBIC);
-        for(int row = 0; row < resized_frame.rows; row++){
-            for(int col = 0; col < resized_frame.cols; col++){
-                bgrPixel = resized_frame.at<cv::Vec3b>(row,col);
-                pixelBrightness = (((int)bgrPixel[0] + (int)bgrPixel[1] + (int)bgrPixel[2]) / 3) / 16;
-                std::cout << "\e[38;2;" << (int)bgrPixel[2] << ";" << (int)bgrPixel[1] << ";" << (int) bgrPixel[0] << "m" << CHAR_POOL[pixelBrightness];
-            }
-            std::cout << "\n";
-        }
+        attron(COLOR_PAIR(1));
+        attron(A_BOLD);
+        printw("<----Video to ASCII Media Player---->\n\n");
+        attroff(A_BOLD);
+        printw("Use arrow keys and enter to select and option\n\n");
 
-        std::cout << "\e[H";
-        capture.read(frame);
-        if(frame.empty()) break;
-        
-        expectedTime = estimatedDurationOfFrame*currentFrame;
-        endClock = std::chrono::high_resolution_clock::now(); 
-        currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(endClock-startClock).count();
+        if(selection == 0) attrset(COLOR_PAIR(2));
+        printw("Start Lofi Ascii Player\n");
+        refresh();
 
-        if(currentTime < expectedTime){
-            std::this_thread::sleep_for(std::chrono::milliseconds((int)(expectedTime-currentTime)));
+        attrset(COLOR_PAIR(1));
+        if(selection == 1) attrset(COLOR_PAIR(2));
+        printw("Select Playback Folder\n");
+        refresh();
+
+        attrset(COLOR_PAIR(1));
+        if(selection == 2) attrset(COLOR_PAIR(2));
+        printw("Download Youtube Videos/Playlists\n");
+        refresh();
+
+        attrset(COLOR_PAIR(1));
+        if(selection == 3) attrset(COLOR_PAIR(2));
+        printw("Configure Player Resolution\n");
+        refresh();
+
+        attrset(COLOR_PAIR(1));
+        if(selection == 4 )attrset(COLOR_PAIR(2));
+        printw("Configure Player Art Type\n");
+        refresh();
+
+        attrset(COLOR_PAIR(1));
+        if(selection == 5) attrset(COLOR_PAIR(2));
+        printw("Exit");
+        refresh();
+
+        switch(readOptions()){
+            case 0:
+                if(selection == 0) break;
+                selection--;
+                break;
+            case 1:
+                if(selection == 5) break;
+                selection++;
+                break;
+            case 2:
+                confirmed = true;
+                break;
+
+            default:
+                break;
+        };
+
+        refresh();
+
+        if(confirmed){
+            
+            switch(selection){
+                case 0:
+                    endwin();
+                    play_video(&video_width, &video_height);
+                    initscr();
+                    break;
+                case 1:
+                    clear();
+                    browse_and_select(&files);
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    endwin();
+                    return(0);
+                default:
+                    break;
+            };
+            confirmed = false;
         }
     }
 
-    cv::destroyAllWindows();
+    endwin();
     return(0);
 }
