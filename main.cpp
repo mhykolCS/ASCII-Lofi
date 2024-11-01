@@ -24,6 +24,7 @@ int main(){
     system("mkdir -p data");
     init_pair(1, COLOR_WHITE, COLOR_BLACK);
     init_pair(2, COLOR_BLACK, COLOR_WHITE);
+    init_pair(3, COLOR_BLACK, COLOR_CYAN);
 
     int video_width = 137;
     int video_height = 40;
@@ -39,7 +40,7 @@ int main(){
         attron(A_BOLD);
         printw("<----Video to ASCII Media Player---->\n\n");
         attroff(A_BOLD);
-        printw("Use arrow keys and enter to select and option\n\n");
+        printw("Use arrow keys and enter to select an option\n\n");
 
         if(selection == 0) attrset(COLOR_PAIR(2));
         printw("Start Lofi Ascii Player\n");
