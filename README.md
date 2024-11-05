@@ -8,7 +8,7 @@
     make build
     ```
 3. Start the project
-    ``
+    ```
     make start
     ```
     

@@ -56,7 +56,7 @@ void render(int* width, int* height, std::string* video_name){
             std::cout << "\e[0G";
         }
 
-        //if(currentFrame % (int)fps == 0) std::cout << "\e[2J";
+        if(currentFrame % (int)fps == 0) std::cout << "\e[2J";
         std::cout << "\e[H";
         capture.read(frame);
         if(frame.empty()) break;
