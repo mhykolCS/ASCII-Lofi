@@ -1,4 +1,5 @@
-#include "asciiLofi.h"
+#include "asciiLofi.hpp"
+#include "MultimediaPlayer.hpp"
 #include <ncurses.h>
 
 
@@ -22,18 +23,21 @@ int main(){
     noecho();
     start_color();
     system("mkdir -p data");
+    
     init_pair(1, COLOR_WHITE, COLOR_BLACK);
     init_pair(2, COLOR_BLACK, COLOR_WHITE);
     init_pair(3, COLOR_BLACK, COLOR_CYAN);
 
-    int video_width = 137;
-    int video_height = 40;
+    MultimediaPlayer multimediaPlayer(240, 60);
+
+    std::cout << "\x1b]2;Video to ASCII Media Player\x07";
+
     int selection = 0;
     bool confirmed = false;
 
-    std::vector<std::string> videos;
-
     for(;;){
+        clear();
+        refresh();
         move(0,0);
 
         attron(COLOR_PAIR(1));
@@ -67,20 +71,25 @@ int main(){
         refresh();
 
         attrset(COLOR_PAIR(1));
-        if(selection == 5) attrset(COLOR_PAIR(2));
+        if(selection == 5 )attrset(COLOR_PAIR(2));
+        printw("Configure Sound Device\n");
+        refresh();
+
+        attrset(COLOR_PAIR(1));
+        if(selection == 6) attrset(COLOR_PAIR(2));
         printw("Exit");
         refresh();
 
         switch(readOptions()){
             case 0:
                 if(selection == 0){
-                    selection = 5;
+                    selection = 6;
                     break;
                 }
                 selection--;
                 break;
             case 1:
-                if(selection == 5){
+                if(selection == 6){
                     selection = 0;
                     break;
                 }
@@ -100,15 +109,13 @@ int main(){
             
             switch(selection){
                 case 0:
-                    //endwin();
-                    for(int i = 0; i < videos.size(); i++){
-                        play_video(&videos.at(i), &video_width, &video_height);
+                    for(multimediaPlayer.playbackReset(); multimediaPlayer.getCurrentFileIndex() < multimediaPlayer.getTotalFiles();){
+                        play_video(&multimediaPlayer);
                     }
-                    //initscr();
                     break;
                 case 1:
                     clear();
-                    browse_and_select(&videos);
+                    browse_and_select(&multimediaPlayer);
                     break;
                 case 2:
                     break;
@@ -117,8 +124,11 @@ int main(){
                 case 4:
                     break;
                 case 5:
+                    break;
+                case 6:
                     endwin();
                     return(0);
+                    initscr();
                 default:
                     break;
             };

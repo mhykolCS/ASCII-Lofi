@@ -1,4 +1,4 @@
-#include "asciiLofi.h"
+#include "asciiLofi.hpp"
 #include <ncurses.h>
 #include <dirent.h>
 
@@ -10,7 +10,7 @@ struct file{
 
 extern int readOptions();
 
-void browse_and_select(std::vector<std::string>* videos){
+void browse_and_select(MultimediaPlayer* multimediaPlayer){
 
     init_pair(1, COLOR_WHITE, COLOR_BLACK);
     init_pair(2, COLOR_BLACK, COLOR_WHITE);
@@ -39,9 +39,9 @@ void browse_and_select(std::vector<std::string>* videos){
 
     selection = 0;
 
-    for(int i = 0; i < videos->size(); i++){
+    for(int i = 0; i < multimediaPlayer->getTotalFiles(); i++){
         for(int j = 0; j < allFiles.size(); j++){
-            if (videos->at(i) == allFiles.at(j).name) allFiles.at(j).enabled = true;
+            if (multimediaPlayer->getFilenameAtIndex(i) == allFiles.at(j).name) allFiles.at(j).enabled = true;
         }
     }
 
@@ -99,10 +99,10 @@ void browse_and_select(std::vector<std::string>* videos){
         if(confirmed){
 
             if(selection == allFiles.size()){
-                videos->clear();
+                multimediaPlayer->clearFilenames();
                 for(int i = 0; i < allFiles.size(); i++){
                     if(allFiles.at(i).enabled) {
-                        videos->push_back(std::string(allFiles.at(i).name));
+                        multimediaPlayer->appendFilename(std::string(allFiles.at(i).name));
                     }
                 }
                 closedir(dir);
