@@ -1,4 +1,5 @@
-m.vscode/
-opencv2/
+.vscode/
+vscode/
 data/
+build/
 todo.txt

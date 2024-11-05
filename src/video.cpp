@@ -1,18 +1,16 @@
 #include "asciiLofi.h"
-#include "opencv2/opencv.hpp"
+#include <opencv2/opencv.hpp>
 #include <string>
 #include <chrono>
 #include <thread>
+#include <ncurses.h>
 
 
+void listenForKeyPress(){
+    
+}
 
-void play_video(int* width, int* height ){
-    std::cout << "\e[48;2;0;0;0m"; //Set background colour to black
-    std::cout << "\e[H"; //Set to 0,0
-    std::cout << "\e[?25l"; //Remove cursor
-    cv::Mat frame, resized_frame;
-    cv::VideoCapture capture("data/dan.webm");
-
+void render(int* width, int* height, std::string* video_name){
     auto startClock = std::chrono::high_resolution_clock::now(); 
     auto endClock = std::chrono::high_resolution_clock::now(); 
     auto actualDurationOfFrame = std::chrono::duration_cast<std::chrono::milliseconds>(endClock-startClock).count();
@@ -21,6 +19,11 @@ void play_video(int* width, int* height ){
     const std::string CHAR_POOL = " ..--==++''**\%%\%%##";
     std::string outputStream = "";
     //const std::string CHAR_POOL = "#####################";
+
+    std::string filepath = "data/" + *video_name;
+
+    cv::Mat frame, resized_frame;
+    cv::VideoCapture capture(filepath);
 
     if(!capture.isOpened()) return;
 
@@ -34,22 +37,26 @@ void play_video(int* width, int* height ){
     startClock = std::chrono::high_resolution_clock::now(); 
     int currentTime;
 
-
-
     for(;;){
+
         currentFrame += 1;
 
         cv::resize(frame, resized_frame, cv::Size(*width, *height), cv::INTER_CUBIC);
         for(int row = 0; row < resized_frame.rows; row++){
             for(int col = 0; col < resized_frame.cols; col++){
+                
                 bgrPixel = resized_frame.at<cv::Vec3b>(row,col);
                 pixelBrightness = (((int)bgrPixel[0] + (int)bgrPixel[1] + (int)bgrPixel[2]) / 3) / 16;
                 outputStream += "\e[38;2;" + std::to_string((int)bgrPixel[2]) + ";" + std::to_string((int)bgrPixel[1]) + ";" + std::to_string((int) bgrPixel[0]) + "m\u2588";
                 //outputStream += "\e[38;2;" + std::to_string((int)bgrPixel[2]) + ";" + std::to_string((int)bgrPixel[1]) + ";" + std::to_string((int) bgrPixel[0]) + "m" + CHAR_POOL[pixelBrightness];
             }
-            std::cout << outputStream << std::endl;
+            std::cout << outputStream;
             outputStream = "";
+            std::cout << "\n";
+            std::cout << "\e[0G";
         }
+
+        //if(currentFrame % (int)fps == 0) std::cout << "\e[2J";
         std::cout << "\e[H";
         capture.read(frame);
         if(frame.empty()) break;
@@ -61,7 +68,20 @@ void play_video(int* width, int* height ){
         if(currentTime < expectedTime){
             std::this_thread::sleep_for(std::chrono::milliseconds((int)(expectedTime-currentTime)));
         }
+
     }
+}
+
+
+
+void play_video(std::string* video_name, int* width, int* height ){
+    std::cout << "\e[48;2;0;0;0m"; //Set background colour to black
+    std::cout << "\e[H"; //Set to 0,0
+    std::cout << "\e[?25l"; //Remove cursor
+
+    render(width, height, video_name);
+
+    listenForKeyPress();
 
     cv::destroyAllWindows();
 

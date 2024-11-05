@@ -3,7 +3,7 @@
 #include <dirent.h>
 
 struct file{
-    char* name;
+    std::string name;
     bool enabled;
     int ID;
 };
@@ -33,7 +33,7 @@ void browse_and_select(std::vector<std::string>* videos){
 
     while((ent = readdir(dir)) != NULL){
         if(std::string(ent->d_name) == "." || std::string(ent->d_name) == "..") continue;
-        allFiles.push_back({ent->d_name, false, selection});
+        allFiles.push_back({std::string(ent->d_name), false, selection});
         selection++;
     }
 
@@ -56,7 +56,7 @@ void browse_and_select(std::vector<std::string>* videos){
             attrset(COLOR_PAIR(1));
             if(it->enabled) attrset(COLOR_PAIR(2));
             if(it->ID == selection) attrset(COLOR_PAIR(3));
-            printw("%s\n", it->name);
+            printw("%s\n", it->name.c_str());
             refresh();
 
         }
@@ -75,11 +75,17 @@ void browse_and_select(std::vector<std::string>* videos){
 
         switch(readOptions()){
             case 0:
-                if(selection == 0) break;
+                if(selection == 0){
+                    selection = allFiles.size() + 1;
+                    break;
+                }
                 selection--;
                 break;
             case 1:
-                if(selection == allFiles.size()+1) break;
+                if(selection == allFiles.size()+1) {
+                    selection = 0;
+                    break;   
+                }
                 selection++;
                 break;
             case 2:
@@ -95,7 +101,9 @@ void browse_and_select(std::vector<std::string>* videos){
             if(selection == allFiles.size()){
                 videos->clear();
                 for(int i = 0; i < allFiles.size(); i++){
-                    if(allFiles.at(i).enabled) videos->push_back(allFiles.at(i).name);
+                    if(allFiles.at(i).enabled) {
+                        videos->push_back(std::string(allFiles.at(i).name));
+                    }
                 }
                 closedir(dir);
                 clear();

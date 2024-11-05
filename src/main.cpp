@@ -31,7 +31,7 @@ int main(){
     int selection = 0;
     bool confirmed = false;
 
-    std::vector<std::string> files;
+    std::vector<std::string> videos;
 
     for(;;){
         move(0,0);
@@ -73,11 +73,17 @@ int main(){
 
         switch(readOptions()){
             case 0:
-                if(selection == 0) break;
+                if(selection == 0){
+                    selection = 5;
+                    break;
+                }
                 selection--;
                 break;
             case 1:
-                if(selection == 5) break;
+                if(selection == 5){
+                    selection = 0;
+                    break;
+                }
                 selection++;
                 break;
             case 2:
@@ -94,13 +100,15 @@ int main(){
             
             switch(selection){
                 case 0:
-                    endwin();
-                    play_video(&video_width, &video_height);
-                    initscr();
+                    //endwin();
+                    for(int i = 0; i < videos.size(); i++){
+                        play_video(&videos.at(i), &video_width, &video_height);
+                    }
+                    //initscr();
                     break;
                 case 1:
                     clear();
-                    browse_and_select(&files);
+                    browse_and_select(&videos);
                     break;
                 case 2:
                     break;
