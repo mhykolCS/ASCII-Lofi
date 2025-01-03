@@ -64,9 +64,14 @@ void render(int* width, int* height, std::string video_name){
         expectedTime = estimatedDurationOfFrame*currentFrame;
         endClock = std::chrono::high_resolution_clock::now(); 
         currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(endClock-startClock).count();
-
+        
         if(currentTime < expectedTime){
             std::this_thread::sleep_for(std::chrono::milliseconds((int)(expectedTime-currentTime)));
+        }
+
+        if(currentTime > expectedTime){
+            currentFrame+=;
+            capture.read(frame);
         }
         
     }

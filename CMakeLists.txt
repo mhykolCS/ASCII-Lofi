@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(lofiAscii)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 find_package(OpenCV REQUIRED)
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
