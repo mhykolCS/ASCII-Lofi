@@ -4,6 +4,7 @@
 #include <chrono>
 #include <thread>
 #include <ncurses.h>
+#include <fmt/core.h>
 
 
 void listenForKeyPress(){
@@ -51,13 +52,14 @@ void render(int* width, int* height, std::string video_name){
                 outputStream += "\e[38;2;" + std::to_string((int)bgrPixel[2]) + ";" + std::to_string((int)bgrPixel[1]) + ";" + std::to_string((int) bgrPixel[0]) + "m\u2588";
                 //outputStream += "\e[38;2;" + std::to_string((int)bgrPixel[2]) + ";" + std::to_string((int)bgrPixel[1]) + ";" + std::to_string((int) bgrPixel[0]) + "m" + CHAR_POOL[pixelBrightness];
             }
-            std::cout << outputStream;
-            outputStream = "";
-            std::cout << "\n";
-            std::cout << "\e[0G";
+            outputStream += "\n\e[0G";
         }
+        fmt::print("{}", outputStream);
+        outputStream = "";
+        fmt::print("\n");
+        //fmt::print("\e[0G");
         //if(currentFrame % (int)fps == 0) std::cout << "\e[2J";
-        std::cout << "\e[H";
+        fmt::print("\e[H");
         capture.read(frame);
         if(frame.empty()) break;
         
@@ -70,7 +72,8 @@ void render(int* width, int* height, std::string video_name){
         }
 
         if(currentTime > expectedTime){
-            currentFrame+=;
+            currentFrame+=2;
+            capture.read(frame);
             capture.read(frame);
         }
         

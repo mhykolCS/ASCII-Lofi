@@ -28,7 +28,8 @@ int main(){
     init_pair(2, COLOR_BLACK, COLOR_WHITE);
     init_pair(3, COLOR_BLACK, COLOR_CYAN);
 
-    MultimediaPlayer multimediaPlayer(240, 60);
+    MultimediaPlayer multimediaPlayer(270, 60);
+    //MultimediaPlayer multimediaPlayer(150, 32);
 
     std::cout << "\x1b]2;Video to ASCII Media Player\x07";
 
