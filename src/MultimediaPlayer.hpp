@@ -1,35 +1,44 @@
-#include "asciiLofi.hpp"
-#include <string>
-#include <vector>
-
-#ifndef MULTIMEDIAPLAYER_H
-#define MULTIMEDIAPLAYER_H
+#include <libavcodec/avcodec.h>
+#define INBUF_SIZE 4096
+#define AUDIO_INBUF_SIZE 20480
+#define AUDIO_REFILL_THRESH 4096
 
 class MultimediaPlayer{
     public:
-        MultimediaPlayer(int width, int height) : v_width(width), v_height(height) {};
-
-
-        void appendFilename(std::string filename){filenames.push_back(filename);};
-        void clearFilenames(){filenames.clear();};
-        void playbackReset(){currentFile = 0;};
-
-        void setWidth(int width){v_width = width;};
-        void setHeight(int height){v_height = height;};
-
-        int* getWidth_P(){return(&v_width);};
-        int* getHeight_P(){return(&v_height);};
-        int getTotalFiles(){return(filenames.size());};
-        int getCurrentFileIndex(){return(currentFile);};
-        std::string getNextFile();
-        std::string getFilenameAtIndex(int i){return(filenames.at(i));};
-        std::string* getFilenameAtIndex_P(int i){return(&filenames.at(i));};
-
+        MultimediaPlayer();
+        ~MultimediaPlayer();
     private:
-        int v_height;
-        int v_width;
-        int currentFile = 0;
-        std::vector<std::string> filenames;
+        const char *fileName;
+        const AVCodec *codec;
+        AVCodecParserContext *parser;
+        AVCodecContext *c= NULL;
+        FILE *f;
+        uint8_t *data;
+        size_t   data_size;
+        int ret;
+        AVPacket *pkt;       
+        
 };
 
-#endif
+class VideoPlayer : public MultimediaPlayer{
+    public:
+        VideoPlayer();
+        ~VideoPlayer();
+    private:
+        uint8_t inbuf[INBUF_SIZE + AV_INPUT_BUFFER_PADDING_SIZE];
+        int eof;
+
+};
+
+class AudioPlayer : public MultimediaPlayer{
+    public:
+        AudioPlayer();
+        ~AudioPlayer();
+    private:
+        int len;
+        uint8_t inbuf[AUDIO_INBUF_SIZE + AV_INPUT_BUFFER_PADDING_SIZE];
+        AVFrame *decoded_frame = NULL;
+        enum AVSampleFormat sfmt;
+        int n_channels = 0;
+        const char *fmt;
+};
