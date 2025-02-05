@@ -1,7 +1,7 @@
 ## Install Instructions:
 1. Install the dependencies: 
     ```
-    yay --no-confirm base-devel gcc make cmake opencv ncurses portaudio fmt vtk hdf5 glew
+    yay --no-confirm base-devel gcc make cmake ncurses fmt ffmpeg
     ```
 2. Build the project
     ```
@@ -11,4 +11,3 @@
     ```
     make start
     ```
-    
